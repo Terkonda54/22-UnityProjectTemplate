@@ -141,6 +141,12 @@ public class GameManager : MonoBehaviour
         
  
 switch(gameState){
+  case gameStates.Start: 
+       //get first game level
+      gameLevelsCount = 1; //set the count for the game levels
+      loadLevel = gameLevelsCount - 1; //the level from the array
+   break; 
+   
   case gameStates.Playing:
 
          //if testing
@@ -167,9 +173,7 @@ switch(gameState){
    public void StartGame()
     {
         //SET ALL GAME LEVEL VARIABLES FOR START OF GAME
-
-        gameLevelsCount = 1; //set the count for the game levels
-        loadLevel = gameLevelsCount - 1; //the level from the array
+        
         SceneManager.LoadScene(gameLevels[loadLevel]); //load first game level
 
         gameState = gameStates.Playing; //set the game state to playing
