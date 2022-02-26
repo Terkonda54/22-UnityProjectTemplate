@@ -64,10 +64,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] //Access to private variables in editor
     private int numberOfLives; //set number of lives in the inspector
     static public int lives; // number of lives for player 
-    public int Lives { get { return lives; } set { lives = value; } }//access to private variable died [get/set methods]
+    public int Lives { get { return lives; } set { lives = value; } }//access to static variable lives [get/set methods]
 
     static public int score;  //score value
-    public int Score { get { return score; } set { score = value; } }//access to private variable died [get/set methods]
+    public int Score { get { return score; } set { score = value; } }//access to static variable score [get/set methods]
 
     [SerializeField] //Access to private variables in editor
     [Tooltip("Check to test player lost the level")]
@@ -97,18 +97,15 @@ public class GameManager : MonoBehaviour
 
     [Header("FOR TESTING")]
     public bool nextLevel = false; //test for next level
+    
+    //Win/Loose conditon
+    [SerializeField] //to test in inspector
+    private bool playerWon = false;
 
     //Game State Varaiables
     [HideInInspector] public enum gameStates { Idle, Playing, Death, GameOver, BeatLevel };//enum of game states
     [HideInInspector] public gameStates gameState = gameStates.Idle;//current game state
-
-    //Timer Varaibles
-    private float currentTime; //sets current time for timer
-    private bool gameStarted = false; //test if games has started
-
-    //Win/Loose conditon
-    [SerializeField] //to test in inspector
-    private bool playerWon = false;
+   
  
    //reference to system time
    private static string thisDay = System.DateTime.Now.ToString("yyyy"); //today's date as string
@@ -142,9 +139,15 @@ public class GameManager : MonoBehaviour
 
         //if we are playing the game
         if (gameState == gameStates.Playing)
-        {
-            //if we have died and have no more lives, go to game over
-            if (levelLost && (lives == 0)) { GameOver(); }
+        { 
+            //if we lost the level
+            if (levelLost){
+            
+             if(lives == 0) {GameOver();} //if we lost all lives go to game over
+             else{lives--; levelLost = false;} // subtract from lives reset level lost 
+             
+            }// end if(levelLost)
+              
 
         }//end if (gameState == gameStates.Playing)
 
