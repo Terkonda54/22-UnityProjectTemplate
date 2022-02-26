@@ -142,9 +142,7 @@ public class GameManager : MonoBehaviour
  
 switch(gameState){
   case gameStates.Start: 
-       //get first game level
-      gameLevelsCount = 1; //set the count for the game levels
-      loadLevel = gameLevelsCount - 1; //the level from the array
+ 
    break; 
    
   case gameStates.Playing:
@@ -171,12 +169,23 @@ switch(gameState){
 
     //LOAD THE GAME FOR THE FIRST TIME OR RESTART
    public void StartGame()
-    {
+    {  
+        //if have not loaded any game levels
+        if(gameLevelCount == 0) {
+            //get first game level
+            gameLevelsCount = 1; //set the count for the game levels
+            loadLevel = gameLevelsCount - 1; //the level from the array
+         }
+         
         //SET ALL GAME LEVEL VARIABLES FOR START OF GAME
         
+        gameState = gameStates.Playing;//set the game state to playing
+        
         SceneManager.LoadScene(gameLevels[loadLevel]); //load first game level
+        
+        //store the current scene
+        currentSceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
 
-        gameState = gameStates.Playing; //set the game state to playing
 
         lives = numberOfLives; //set the number of lives
         score = 0; //set starting score
@@ -215,6 +224,9 @@ switch(gameState){
        else { endMsg = looseMessage; } //set the end message
 
         SceneManager.LoadScene(gameOverScene); //load the game over scene
+      
+        gameLevelsCount = 0;  //reset the count for the game level
+        
         Debug.Log("Gameover");
     }
     
@@ -236,7 +248,7 @@ switch(gameState){
 
     }//end NextLevel()
 
-    
+    //PLAYER LOST A LIFE
     public void LostLife(){
           if(lives == 0) {
             gameState = gameStates.GameOver;
@@ -251,7 +263,6 @@ switch(gameState){
                 StartGame();
               }
 
-             
            } // end elseif
      }//end LostLife()
              
