@@ -63,12 +63,12 @@ public class GameManager : MonoBehaviour
 
     //static vairables can not be updated in the inspector, however private serialized fileds can be
     [SerializeField] //Access to private variables in editor
-    private int numberOfLives; //set number of lives in the inspector
-    static public int lives; // number of lives for player 
-    public int Lives { get { return lives; } set { lives = value; } }//access to private variable died [get/set methods]
+    private int numberOfLives = 3; //set number of lives in the inspector
+    static public int lives ; // number of lives for player 
+    public int Lives { get { return lives; } set { lives = value; } }//access to static lives
 
     static public int score;  //score value
-    public int Score { get { return score; } set { score = value; } }//access to private variable died [get/set methods]
+    public int Score { get { return score; } set { score = value; } }//access to static score
 
     [SerializeField] //Access to private variables in editor
     [Tooltip("Check to test player lost the level")]
@@ -103,17 +103,16 @@ public class GameManager : MonoBehaviour
     [Header("FOR TESTING")]
     public bool nextLevel = false; //test for next level
 
+    //Win/Loose conditon
+    [SerializeField] //to test in inspector
+    private bool playerWon = false;
+
     //Game State Varaiables
     [HideInInspector] public enum gameStates { Idle, Playing, Death, GameOver, BeatLevel };//enum of game states
     [HideInInspector] public gameStates gameState = gameStates.Idle;//current game state
 
     //Timer Varaibles
     private float currentTime; //sets current time for timer
-    private bool gameStarted = false; //test if games has started
-
-    //Win/Loose conditon
-    [SerializeField] //to test in inspector
-    private bool playerWon = false;
 
     //reference to system time
     private static string thisDay = System.DateTime.Now.ToString("yyyy"); //today's date as string
@@ -146,7 +145,12 @@ public class GameManager : MonoBehaviour
             audioSource.clip = backgroundMusicSource;
             audioSource.loop = true;
             audioSource.Play();
-        }
+        }//end if (backgroundMusicSource != null)
+
+        //set the game level counts from the start level
+        gameLevelsCount = 1; //set the count for the game levels
+        loadLevel = gameLevelsCount - 1; //the level from the array
+
     }//end Start()
 
 
@@ -177,12 +181,9 @@ public class GameManager : MonoBehaviour
     public void StartGame()
     {
         //SET ALL GAME LEVEL VARIABLES FOR START OF GAME
+        gameState = gameStates.Playing; //set the game state to gameOver //we are now playing the level
 
-        gameLevelsCount = 1; //set the count for the game levels
-        loadLevel = gameLevelsCount - 1; //the level from the array
         SceneManager.LoadScene(gameLevels[loadLevel]); //load first game level
-
-        gameState = gameStates.Playing; //set the game state to playing
 
         lives = numberOfLives; //set the number of lives
         score = 0; //set starting score
@@ -201,6 +202,7 @@ public class GameManager : MonoBehaviour
         endMsg = defaultEndMessage; //set the end message default
 
         playerWon = false; //set player winning condition to false
+
     }//end StartGame()
 
 
@@ -226,12 +228,10 @@ public class GameManager : MonoBehaviour
 
 
     //GO TO THE NEXT LEVEL
-    void NextLevel()
+    public void NextLevel()
     {
-        Debug.Log("next " + nextLevel);
         nextLevel = false; //reset the next level
-        Debug.Log("next "+ nextLevel);
-        Debug.Log("gameLevelsCount" + gameLevelsCount);
+
         //as long as our level count is not more than the amount of levels
         if (gameLevelsCount < gameLevels.Length)
         {
