@@ -66,6 +66,10 @@ public class LevelManager : MonoBehaviour
     private void Start()
     {
         gm = GameManager.GM; //find the game manager
+        gameState = gm.gameState;// get the game sate
+
+        //if we have not started playing set the defaults
+        if (gameState != GameState.Playing){gm.SetDefaultGameStats();}
 
         if (mainCamera == null) { mainCamera = Camera.main; } //if main camera is null set to the default main camera
         if(playerGameObject == null) { playerGameObject = GameObject.FindGameObjectWithTag("Player"); } //set the player if null
