@@ -306,7 +306,7 @@ public class GameManager : MonoBehaviour
     {
         if (lives == 1) //if there is one life left and it is lost
         {
-            GameOver(); //game is over
+            SetGameState(GameState.LostLevel);// update game state to lost level
 
         }
         else
