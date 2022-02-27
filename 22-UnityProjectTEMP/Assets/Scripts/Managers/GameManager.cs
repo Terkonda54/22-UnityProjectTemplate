@@ -3,7 +3,7 @@
  * Date Created: Feb 23, 2022
  * 
  * Last Edited by: NA
- * Last Edited: Feb 26, 2022
+ * Last Edited: Feb 27, 2022
  * 
  * Description: Intermediate GameManager Template
 ****/
@@ -190,9 +190,7 @@ public class GameManager : MonoBehaviour
         switch (gameState)
         {
             case GameState.Title:
-                //get first game level
-                gameLevelsCount = 1; //set the count for the game levels
-                loadLevel = gameLevelsCount - 1; //the level from the array
+                //do nothing
                 break;
 
             case GameState.Playing:
@@ -211,12 +209,7 @@ public class GameManager : MonoBehaviour
                 break;
 
             case GameState.GameOver:
-                //get first game level in case of restart
-                gameLevelsCount = 1; //set the count for the game levels
-                loadLevel = gameLevelsCount - 1; //the level from the array
-
-                lm = null; //reset levle manager
-
+                //do nothing
                 break;
 
             case GameState.Idle:
@@ -229,11 +222,21 @@ public class GameManager : MonoBehaviour
 
     //LOAD THE GAME FOR THE FIRST TIME OR RESTART
     public void StartGame()
-    {
-
-        //load first game level
+    { 
+        //get first game level
+        gameLevelsCount = 1; //set the count for the game levels
+        loadLevel = gameLevelsCount - 1; //the level from the array
+       
+       //load first game level
         SceneManager.LoadScene(gameLevels[loadLevel]);
+        
+        SetDefaultGameStats(); // the game stats defaults 
+        
+    }//end StartGame()
+    
 
+public void SetDefaultGameStats()
+    {
         //store the current scene
         currentSceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
 
@@ -259,7 +262,7 @@ public class GameManager : MonoBehaviour
 
         SetGameState(GameState.Playing);//set the game state to playing
 
-    }//end StartGame()
+    }//end SetDefaultGameStats()
 
 
 
