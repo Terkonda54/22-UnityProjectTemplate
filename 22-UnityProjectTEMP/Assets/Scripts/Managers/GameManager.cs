@@ -309,7 +309,9 @@ public void SetDefaultGameStats()
     {
         if (lives == 1) //if there is one life left and it is lost
         {
-            SetGameState(GameState.LostLevel);// update game state to lost level
+            lives = 0; //should update the level manager to run the level end on update
+        
+           // SetGameState(GameState.LostLevel);// update game state to lost level
 
         }
         else
