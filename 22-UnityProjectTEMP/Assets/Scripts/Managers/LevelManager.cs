@@ -3,7 +3,7 @@
  * Date Created: Feb 23, 2022
  * 
  * Last Edited by: NA
- * Last Edited: Feb 23, 2022
+ * Last Edited: Feb 26, 2022
  * 
  * Description: Basic level manager
 ****/
@@ -15,8 +15,8 @@ using UnityEngine;
 public class LevelManager : MonoBehaviour
 {
     /*** VARIABLES ***/
-
     GameManager gm; //reference to game manager
+    GameState gameState; //reference to the current game state
 
     [Header("LEVEL SETTINGS")]
     public Camera mainCamera; //reference to main camera
@@ -35,8 +35,10 @@ public class LevelManager : MonoBehaviour
     [Tooltip("Is the level timed")]
     public bool timedLevel = false; //is the leve timed 
     public float startTime = 10f; //time for level (if level is timed)
-    static public float currentTime; //current time of timer (made static incase we can add to time through powerups)
-    static public string displayTime; //current time string to display
+    [HideInInspector]
+    public float currentTime; //current time of timer
+    [HideInInspector]
+    public string displayTime; //current time string to display
     private bool timerStarted = false; //timer started
     private bool timerEnded = false; //check if timer has ended
     [Space(10)]
@@ -50,22 +52,20 @@ public class LevelManager : MonoBehaviour
     [Tooltip("Must collect all colletables to beat level")]
     public bool collectAll; //all colectables must be collected
     [Tooltip("Number of collectables to beat level")]
-    public int numberToCollect; //number of collectables to beat the level
-    static public int collectAmount; //number of collectables to beat the level
+    public int collectAmount; //number of collectables to beat the level
     private GameObject[] collectables; //array of all colletable game objects
     private int collectablesCount; //number of total colletables in level
-    static public int collectablesCollected = 0; //number of collectables collected by player
+    [HideInInspector]
+    public int collectablesCollected = 0; //number of collectables collected by player
 
-   
+
     /*** MEHTODS ***/
+
 
     // Start is called before the first frame update
     private void Start()
     {
-       gm = GameManager.GM; //find the game manager
-
-        //game state is idle start game to change state to playing
-        if (GameManager.GM.gameState == GameManager.gameStates.Idle) {gm.StartGame();}
+        gm = GameManager.GM; //find the game manager
 
         if (mainCamera == null) { mainCamera = Camera.main; } //if main camera is null set to the default main camera
         if(playerGameObject == null) { playerGameObject = GameObject.FindGameObjectWithTag("Player"); } //set the player if null
@@ -75,16 +75,19 @@ public class LevelManager : MonoBehaviour
 
         if (timedLevel) { currentTime = startTime;  } // if this is a timed level,set the current time to the startTime specified
 
-        if (collectableLevel){GetCollectables();} //if this is a collectable level get count of colletables
+        if (collectableLevel){SetCollectables();} //if this is a collectable level get count of colletables
+
+
 
     }//end Start();
 
     // Update is called once per frame
     private void Update()
     {
+        gameState = gm.gameState;
 
         //check input as long as we are playing
-        if (GameManager.GM.gameState == GameManager.gameStates.Playing)
+        if (gameState == GameState.Playing)
         {
             levelLives = gm.Lives; //updates the number of lives based game manager lives
 
@@ -113,7 +116,8 @@ public class LevelManager : MonoBehaviour
     }//end StartTimer();
 
 
-    private void GetCollectables()
+    //Sets the number of collectables to get
+    private void SetCollectables()
     {
         //if all collectables are spwaned at the start of the level 
         if (collectableExsistOnStart)
@@ -123,19 +127,25 @@ public class LevelManager : MonoBehaviour
             collectablesCount = collectables.Length;
 
             //Check if we need to collect all collectables
-            if (collectAll) { numberToCollect = collectablesCount; }
+            if (collectAll) { collectAmount = collectablesCount; }
         }
 
-        collectAmount = numberToCollect; //set number of collectables to collect
 
     }//end GetCollectables()
 
+
+    //collectable added to collection
+    public void CollectableAquired()
+    {
+        collectablesCollected++;
+    }//end CollectableAquired()
+
     private void LevelEnd()
     {
-        gm.gameState = GameManager.gameStates.Idle; //set the game state
+        gm.SetGameState(GameState.Idle); //set the game state
 
         Debug.Log("Level Over");
-   
+
         gm.NextLevel();
     }//end LevelEnd()
 

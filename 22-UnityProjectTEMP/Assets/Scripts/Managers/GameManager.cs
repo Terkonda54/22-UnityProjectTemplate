@@ -3,9 +3,9 @@
  * Date Created: Feb 23, 2022
  * 
  * Last Edited by: NA
- * Last Edited: Feb 24, 2022
+ * Last Edited: Feb 26, 2022
  * 
- * Description: Basic GameManager Template
+ * Description: Intermediate GameManager Template
 ****/
 
 /** Import Libraries **/
@@ -14,6 +14,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement; //libraries for accessing scenes
+
+//Setting the enum outside the class allows for direct access by the enum (classes) name directly in other classes.
+public enum GameState { Title, Playing, BeatLevel, LostLevel, GameOver, Idle };//enum of game states (work like it's own class)
 
 //GameManager required an Audio Source
 [RequireComponent(typeof(AudioSource))]
@@ -44,6 +47,9 @@ public class GameManager : MonoBehaviour
     }//end CheckGameManagerIsInScene()
     #endregion
 
+    //Game State Varaiables
+    [HideInInspector] public GameState gameState = GameState.Title; //first game state
+
     [Header("GENERAL SETTINGS")]
     public string gameTitle = "Untitled Game";  //name of the game
     public string gameCredits = "Made by Me"; //game creator(s)
@@ -63,18 +69,16 @@ public class GameManager : MonoBehaviour
 
     //static vairables can not be updated in the inspector, however private serialized fileds can be
     [SerializeField] //Access to private variables in editor
-    private int numberOfLives = 3; //set number of lives in the inspector
-    static public int lives ; // number of lives for player 
-    public int Lives { get { return lives; } set { lives = value; } }//access to static lives
+    private int numberOfLives; //set number of lives in the inspector
+    [Tooltip("Does the level get reset when a life is lost")]
+    public bool resetLostLevel; //reset the lost level
+    static public int lives; // number of lives for player 
+    public int Lives { get { return lives; } set { lives = value; } }//access to static variable lives [get/set methods]
 
     static public int score;  //score value
-    public int Score { get { return score; } set { score = value; } }//access to static score
+    public int Score { get { return score; } set { score = value; } }//access to static variable score [get/set methods]
 
-    [SerializeField] //Access to private variables in editor
-    [Tooltip("Check to test player lost the level")]
-    private bool levelLost = false;//we have lost the level (ie. player died)
-    public bool LevelLost { get { return levelLost; } set { levelLost = value; } } //access to private variable lostLevel [get/set methods]
-    
+
     [Space(10)]
     public AudioClip backgroundMusicSource;
     private AudioSource audioSource;
@@ -84,6 +88,7 @@ public class GameManager : MonoBehaviour
     public string looseMessage = "You Loose"; //Message if player looses
     public string winMessage = "You Win"; //Message if player wins
     [HideInInspector] public string endMsg;//the end screen message, depends on winning outcome
+
 
     [Header("SCENE SETTINGS")]
     [Tooltip("Name of the start scene")]
@@ -101,21 +106,27 @@ public class GameManager : MonoBehaviour
     public static string currentSceneName; //the current scene name;
 
     [Header("FOR TESTING")]
+    public bool TestGameManager = false; // test game manager functionality
+
+    [SerializeField] //Access to private variables in editor
+    [Tooltip("Check to test player lost the level")]
+    private bool levelLost = false;//we have lost the level (ie. player died)
+
+    //test next level
+    [SerializeField] //Access to private variables in editor
     public bool nextLevel = false; //test for next level
 
     //Win/Loose conditon
-    [SerializeField] //to test in inspector
+    [SerializeField] //Access to private variables in editor
     private bool playerWon = false;
 
-    //Game State Varaiables
-    [HideInInspector] public enum gameStates { Idle, Playing, Death, GameOver, BeatLevel };//enum of game states
-    [HideInInspector] public gameStates gameState = gameStates.Idle;//current game state
-
-    //Timer Varaibles
-    private float currentTime; //sets current time for timer
 
     //reference to system time
-    private static string thisDay = System.DateTime.Now.ToString("yyyy"); //today's date as string
+    static private string thisDay = System.DateTime.Now.ToString("yyyy"); //today's date as string
+
+    //refence to level manager
+    static private LevelManager lm;
+    public LevelManager LM { get { return lm; }} //acces to level manager
 
 
     /*** MEHTODS ***/
@@ -133,11 +144,11 @@ public class GameManager : MonoBehaviour
         GetHighScore();
 
     }//end Awake()
-    
+
+
     // Start is called before the first frame update
     private void Start()
     {
-
         //if background music exsists
         if (backgroundMusicSource != null)
         {
@@ -147,9 +158,6 @@ public class GameManager : MonoBehaviour
             audioSource.Play();
         }//end if (backgroundMusicSource != null)
 
-        //set the game level counts from the start level
-        gameLevelsCount = 1; //set the count for the game levels
-        loadLevel = gameLevelsCount - 1; //the level from the array
 
     }//end Start()
 
@@ -160,31 +168,77 @@ public class GameManager : MonoBehaviour
         //if ESC is pressed , exit game
         if (Input.GetKey("escape")) { ExitGame(); }
 
-        //Check for next level
-        if (nextLevel) { NextLevel(); }
+        //check for game state changes
+        CheckGameState();
 
-        //if we are playing the game
-        if (gameState == gameStates.Playing)
-        {
-            //if we have died and have no more lives, go to game over
-            if (levelLost && (lives == 0)) { GameOver(); }
-
-        }//end if (gameState == gameStates.Playing)
-
-        //Check Score
-        CheckScore();
+        //Output game state
+        Debug.Log("Game State " + gameState);
 
     }//end Update
+
+
+    //SET GAME STATES
+    public void SetGameState(GameState state)
+    {
+        this.gameState = state;
+    }//end SetGameState()
+
+
+    //CHECK FOR GAME STATE CHANGES
+    private void CheckGameState()
+    {
+        switch (gameState)
+        {
+            case GameState.Title:
+                //get first game level
+                gameLevelsCount = 1; //set the count for the game levels
+                loadLevel = gameLevelsCount - 1; //the level from the array
+                break;
+
+            case GameState.Playing:
+                //if testing
+                if (TestGameManager) { RunTests(); }
+                break;
+
+            case GameState.BeatLevel:
+                endMsg = winMessage; //set win message
+                NextLevel(); //check for the next level
+                break;
+
+            case GameState.LostLevel:
+                endMsg = looseMessage; //set loose message
+                GameOver(); //move to game over
+                break;
+
+            case GameState.GameOver:
+                //get first game level in case of restart
+                gameLevelsCount = 1; //set the count for the game levels
+                loadLevel = gameLevelsCount - 1; //the level from the array
+
+                lm = null; //reset levle manager
+
+                break;
+
+            case GameState.Idle:
+                //do nothing
+                break;
+        }//end switch(gameStates)
+    }//end CheckGameState()
+
 
 
     //LOAD THE GAME FOR THE FIRST TIME OR RESTART
     public void StartGame()
     {
+
+        //load first game level
+        SceneManager.LoadScene(gameLevels[loadLevel]);
+
+        //store the current scene
+        currentSceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+
+
         //SET ALL GAME LEVEL VARIABLES FOR START OF GAME
-        gameState = gameStates.Playing; //set the game state to gameOver //we are now playing the level
-
-        SceneManager.LoadScene(gameLevels[loadLevel]); //load first game level
-
         lives = numberOfLives; //set the number of lives
         score = 0; //set starting score
 
@@ -203,6 +257,8 @@ public class GameManager : MonoBehaviour
 
         playerWon = false; //set player winning condition to false
 
+        SetGameState(GameState.Playing);//set the game state to playing
+
     }//end StartGame()
 
 
@@ -214,23 +270,19 @@ public class GameManager : MonoBehaviour
         Debug.Log("Exited Game");
     }//end ExitGame()
 
-
     //GO TO THE GAME OVER SCENE
     public void GameOver()
     {
-        gameState = gameStates.GameOver; //set the game state to gameOver
-
-        if (playerWon) { endMsg = winMessage; } else { endMsg = looseMessage; } //set the end message
+        SetGameState(GameState.GameOver);//set the game state to Game Over
 
         SceneManager.LoadScene(gameOverScene); //load the game over scene
-        Debug.Log("Gameover");
-    }
+
+    }//end GameOver()
 
 
     //GO TO THE NEXT LEVEL
-    public void NextLevel()
+   public void NextLevel()
     {
-        nextLevel = false; //reset the next level
 
         //as long as our level count is not more than the amount of levels
         if (gameLevelsCount < gameLevels.Length)
@@ -238,6 +290,7 @@ public class GameManager : MonoBehaviour
             gameLevelsCount++; //add to level count for next level
             loadLevel = gameLevelsCount - 1; //find the next level in the array
             SceneManager.LoadScene(gameLevels[loadLevel]); //load next level
+
 
         }
         else
@@ -247,8 +300,35 @@ public class GameManager : MonoBehaviour
 
     }//end NextLevel()
 
-    void CheckScore()
-    { //This method manages the score on update. Right now it just checks if we are greater than the high score.
+
+    //PLAYER LOST A LIFE
+    public void LostLife()
+    {
+        if (lives == 1) //if there is one life left and it is lost
+        {
+            GameOver(); //game is over
+
+        }
+        else
+        {
+            lives--; //subtract from lives reset level lost 
+
+            //if this level resets when life is lost
+            if (resetLostLevel)
+            {
+                numberOfLives = lives; //set lives left for level reset
+                StartGame(); //restart the level
+            }//end if (resetLostLevel)
+
+        } // end elseif
+    }//end LostLife()
+
+
+    //CHECK SCORE UPDATES
+    public void UpdateScore(int point = 0)
+    { //This method manages the score on update. 
+
+        score += point;
 
         //if the score is more than the high score
         if (score > highScore)
@@ -271,5 +351,19 @@ public class GameManager : MonoBehaviour
 
         PlayerPrefs.SetInt("HighScore", highScore); //set the playerPref for the high score
     }//end GetHighScore()
+
+
+    private void RunTests()
+    {
+        //test to move to next level
+        if (nextLevel) { nextLevel = false; NextLevel(); }
+
+        //test for lossing level
+        if (levelLost) { levelLost = false; SetGameState(GameState.LostLevel); }
+
+        //test if player won
+        if (playerWon) { SetGameState(GameState.BeatLevel); }
+
+    }//end RunTest()
 
 }

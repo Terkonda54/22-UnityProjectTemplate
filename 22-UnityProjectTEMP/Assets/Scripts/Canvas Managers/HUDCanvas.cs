@@ -34,6 +34,8 @@ public class HUDCanvas : MonoBehaviour
     private int lives;
     private int score;
     private int highscore;
+    private bool timedLevel;
+    private bool collectableLevel;
     private string dispalyTime;
     private int collectableAmount;
     private int collectablesCollected;
@@ -43,11 +45,16 @@ public class HUDCanvas : MonoBehaviour
     private void Start()
     {
         gm = GameManager.GM; //find the game manager
+        lm = GameObject.FindObjectOfType<LevelManager>();//find the Level manager game object
+
+        Debug.Log(lm.gameObject);
 
         //reference to levle info
         level = gm.gameLevelsCount;
         totalLevels = gm.gameLevels.Length;
+
         SetHUD();
+
     }//end Start
 
     // Update is called once per frame
@@ -64,9 +71,11 @@ public class HUDCanvas : MonoBehaviour
         lives = gm.Lives;
         score = gm.Score;
         highscore = gm.HighScore;
-        dispalyTime = LevelManager.displayTime;
-        collectableAmount = LevelManager.collectAmount;
-        collectablesCollected = LevelManager.collectablesCollected;
+        timedLevel = lm.timedLevel;
+        dispalyTime = lm.displayTime;
+        collectableLevel = lm.collectableLevel;
+        collectableAmount = lm.collectAmount;
+        collectablesCollected = lm.collectablesCollected;
     }
 
     void SetHUD()
@@ -76,8 +85,14 @@ public class HUDCanvas : MonoBehaviour
         if (livesTextbox) { livesTextbox.text = "Lives " + lives; }
         if (scoreTextbox) { scoreTextbox.text = "Score " + score; }
         if (highScoreTextbox) { highScoreTextbox.text = "High Score " + highscore; }
-        if (timerTextbox) { timerTextbox.text = "Timer: " + dispalyTime; }
-        if(collecteablesTextbox) { collecteablesTextbox.text = "Collected " + collectablesCollected + "/" + collectableAmount; }
+        
+        //if we have a timer and a timer text box show timer, otherwise show nothing
+        if (timedLevel && timerTextbox) { timerTextbox.text = "Timer: " + dispalyTime; } 
+        else {timerTextbox.text = null; }
+
+        //if we have collectables and collectable textbox show collectables count, otherwise show nothing 
+        if(collectableLevel && collecteablesTextbox) { collecteablesTextbox.text = "Collected " + collectablesCollected + "/" + collectableAmount; } 
+        else {collecteablesTextbox.text = null; }
 
     }//end SetHUD()
 
