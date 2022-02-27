@@ -57,8 +57,8 @@ public class LevelManager : MonoBehaviour
     private int collectablesCount; //number of total colletables in level
     [HideInInspector]
     public int collectablesCollected = 0; //number of collectables collected by player
-
-
+    private bool leveWon;
+    
     /*** MEHTODS ***/
 
 
@@ -91,8 +91,8 @@ public class LevelManager : MonoBehaviour
         {
             levelLives = gm.Lives; //updates the number of lives based game manager lives
 
-            if (levelLives == 0) { LevelEnd(); } //if we have lost all lives go to level end
-            else if (canBeatLevel && (gm.Score >= beatLevelScore)) {LevelEnd(); } //if we can beat the level and our score is greater than the beat level, /end level
+            if (levelLives == 0) {levelWon = false; LevelEnd();}//lives all lost, set to lost, run level end
+            else if (canBeatLevel && (gm.Score >= beatLevelScore)) { levelWon = true; LevelEnd();} //if level beat, set to won, run level end
             else if (timedLevel) { CheckTimer(); } //if we have run out of time
         }
 
@@ -143,10 +143,12 @@ public class LevelManager : MonoBehaviour
     private void LevelEnd()
     {
         gm.SetGameState(GameState.Idle); //set the game state
-
+        
         Debug.Log("Level Over");
-
-        gm.NextLevel();
+        
+        if(levelWon){gm.SetGameState(GameState.BeatLevel);} //if we won the level, go to next level
+        else if(timerEnded || (!levelWon)){gm.SetGameState(GameState.LostLevel);} //otherwise check to see if 
+        
     }//end LevelEnd()
 
 }
