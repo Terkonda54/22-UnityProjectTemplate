@@ -57,7 +57,7 @@ public class LevelManager : MonoBehaviour
     private int collectablesCount; //number of total colletables in level
     [HideInInspector]
     public int collectablesCollected = 0; //number of collectables collected by player
-    private bool leveWon;
+    private bool levelWon;
     
     /*** MEHTODS ***/
 
@@ -151,7 +151,7 @@ public class LevelManager : MonoBehaviour
         Debug.Log("Level Over");
         
         if(levelWon){gm.SetGameState(GameState.BeatLevel);} //if we won the level, go to next level
-        else if(timerEnded || (!levelWon)){gm.SetGameState(GameState.LostLevel);} //otherwise check to see if 
+        else if(timerEnded || (!levelWon)){ gm.SetGameState(GameState.LostLevel);} //otherwise check to see if 
         
     }//end LevelEnd()
 

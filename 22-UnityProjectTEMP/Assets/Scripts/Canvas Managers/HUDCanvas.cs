@@ -27,7 +27,7 @@ public class HUDCanvas : MonoBehaviour
     public Text highScoreTextbox; //textbox for highscore
     public Text timerTextbox; //textbox for timer
     public Text collecteablesTextbox; //textbox for collected count
-    
+
     //GM Data
     private int level;
     private int totalLevels;
@@ -40,6 +40,7 @@ public class HUDCanvas : MonoBehaviour
     private int collectableAmount;
     private int collectablesCollected;
 
+    /*** MEHTODS ***/
 
     // Start is called before the first frame update
     private void Start()
@@ -61,8 +62,8 @@ public class HUDCanvas : MonoBehaviour
     void Update()
     {
 
-            GetGameStats();
-            SetHUD();
+        GetGameStats();
+        SetHUD();
 
     }//end Update()
 
@@ -85,14 +86,14 @@ public class HUDCanvas : MonoBehaviour
         if (livesTextbox) { livesTextbox.text = "Lives " + lives; }
         if (scoreTextbox) { scoreTextbox.text = "Score " + score; }
         if (highScoreTextbox) { highScoreTextbox.text = "High Score " + highscore; }
-        
+
         //if we have a timer and a timer text box show timer, otherwise show nothing
-        if (timedLevel && timerTextbox) { timerTextbox.text = "Timer: " + dispalyTime; } 
-        else {timerTextbox.text = null; }
+        if (timedLevel && timerTextbox) { timerTextbox.text = "Timer: " + dispalyTime; }
+        else { timerTextbox.text = null; }
 
         //if we have collectables and collectable textbox show collectables count, otherwise show nothing 
-        if(collectableLevel && collecteablesTextbox) { collecteablesTextbox.text = "Collected " + collectablesCollected + "/" + collectableAmount; } 
-        else {collecteablesTextbox.text = null; }
+        if (collectableLevel && collecteablesTextbox) { collecteablesTextbox.text = "Collected " + collectablesCollected + "/" + collectableAmount; }
+        else { collecteablesTextbox.text = null; }
 
     }//end SetHUD()
 
