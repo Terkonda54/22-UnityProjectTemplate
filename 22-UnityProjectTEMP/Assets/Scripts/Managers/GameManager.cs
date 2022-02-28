@@ -294,6 +294,7 @@ public void SetDefaultGameStats()
             loadLevel = gameLevelsCount - 1; //find the next level in the array
             SceneManager.LoadScene(gameLevels[loadLevel]); //load next level
 
+            SetGameState(GameState.Playing);//set the game state to playing
 
         }
         else
