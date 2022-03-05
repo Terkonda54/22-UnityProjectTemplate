@@ -144,7 +144,7 @@ public class GameManager : MonoBehaviour
         if (gameState == gameStates.Playing)
         {
             //if we have died and have no more lives, go to game over
-            if (levelLost && (lives == 0)) { GameOver(); }
+            if (levelLost || (lives == 0)) { GameOver(); }
 
         }//end if (gameState == gameStates.Playing)
 

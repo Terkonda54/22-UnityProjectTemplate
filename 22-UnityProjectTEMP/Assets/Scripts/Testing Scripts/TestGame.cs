@@ -21,13 +21,13 @@ public class TestGame : MonoBehaviour
     {
         //add points
         if (Input.GetKeyUp("return")) {
-            GameManager.GM.UpdateScore(point);
+            //GameManager.GM.UpdateScore(point);
         }
 
         //lose live
         if (Input.GetKeyUp("backspace"))
         {
-            GameManager.GM.LostLife();
+            //GameManager.GM.LostLife();
         }
 
     }//end Update()
