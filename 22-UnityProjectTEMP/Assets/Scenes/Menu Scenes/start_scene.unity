@@ -173,7 +173,7 @@ MonoBehaviour:
   defaultHighScore: 1000
   numberOfLives: 3
   levelLost: 0
-  defaultEndMessage: Game Over
+  defaultEndMessage: Game Over! Thanks for playing.
   looseMessage: You Loose
   winMessage: You Win
   endMsg: 
@@ -181,7 +181,7 @@ MonoBehaviour:
   gameOverScene: end_scene
   gameLevels:
   - level_1
-  - level_01
+  - level_2
   gameLevelsCount: 0
   nextLevel: 0
   gameState: 0

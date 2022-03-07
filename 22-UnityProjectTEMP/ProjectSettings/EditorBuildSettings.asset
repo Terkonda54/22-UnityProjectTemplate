@@ -11,13 +11,19 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Menu Scenes/end_scene.unity
     guid: bc32eb117b0fba6428d47afd7e20af10
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Game Scenes/level_00.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Game Scenes/level_01.unity
     guid: 99920b949492d584eaec0ad3ad06d1a1
   - enabled: 1
     path: Assets/Scenes/Game Scenes/level_1.unity
     guid: a3ca1736b40b5a346b8ecb026dee919f
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 1
+    path: Assets/Scenes/Game Scenes/level_2.unity
+    guid: c60f65248449ad64eb97d14327924c1e
   m_configObjects: {}
